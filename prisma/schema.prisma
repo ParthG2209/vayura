@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Optional: For Supabase migrations
+}
+
+// District model - Core entity for Indian districts
+model District {
+  id        String   @id @default(cuid())
+  name      String   // e.g., "Bangalore Urban"
+  slug      String   @unique // e.g., "bangalore-urban"
+  state     String   // e.g., "Karnataka"
+  population Int     // Current population estimate
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  environmentalData  EnvironmentalData[]
+  treeContributions  TreeContribution[]
+  donations          Donation[]
+  leaderboardEntries LeaderboardEntry[]
+
+  @@index([slug])
+  @@index([state])
+}
+
+// Environmental data for each district - Updated periodically
+model EnvironmentalData {
+  id                 String   @id @default(cuid())
+  districtId         String
+  aqi                Float    // Air Quality Index
+  pm25               Float?   // PM2.5 levels
+  soilQuality        Float    // Soil quality index (0-100)
+  disasterFrequency  Float    // Disaster frequency score
+  dataSource         String?  // Source of the data (API name or "fallback")
+  timestamp          DateTime @default(now())
+  createdAt          DateTime @default(now())
+
+  // Relations
+  district District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+
+  @@index([districtId, timestamp])
+  @@index([timestamp])
+}
+
+// Tree plantation contributions from users
+model TreeContribution {
+  id          String   @id @default(cuid())
+  districtId  String
+  imageUrl    String   // S3 or local storage URL
+  status      ContributionStatus @default(PENDING)
+  userName    String?  // Optional: contributor name
+  notes       String?  // Optional: additional context
+  latitude    Float?   // GPS coordinates if available
+  longitude   Float?
+  plantedAt   DateTime @default(now())
+  verifiedAt  DateTime?
+  verifiedBy  String?  // Admin user who verified
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  district District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+
+  @@index([districtId, status])
+  @@index([status])
+  @@index([plantedAt])
+}
+
+enum ContributionStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+// Tree donations through NGO partnerships
+model Donation {
+  id             String   @id @default(cuid())
+  districtId     String
+  ngoReference   String   // NGO identifier (e.g., "tree-nation", "sankalp")
+  treeCount      Int      // Number of trees donated
+  externalId     String?  // External transaction/donation ID
+  donorEmail     String?  // Optional: donor email
+  amount         Float?   // Optional: donation amount
+  donatedAt      DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  // Relations
+  district District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+
+  @@index([districtId])
+  @@index([ngoReference])
+  @@index([donatedAt])
+}
+
+// Leaderboard aggregated data - Computed periodically
+model LeaderboardEntry {
+  id                String   @id @default(cuid())
+  districtId        String   @unique
+  totalTreesPlanted Int      @default(0) // Verified contributions
+  totalTreesDonated Int      @default(0)
+  totalTrees        Int      @default(0) // Combined total
+  oxygenOffset      Float    @default(0) // kg/year
+  rank              Int?
+  lastUpdated       DateTime @updatedAt
+  createdAt         DateTime @default(now())
+
+  // Relations
+  district District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+
+  @@index([rank])
+  @@index([totalTrees])
+  @@index([oxygenOffset])
+}

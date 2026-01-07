@@ -1,0 +1,67 @@
+/* Dashboard-specific styles */
+
+.dashboardContainer {
+  min-height: calc(100vh - 64px);
+  padding-top: 80px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.statCard:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.searchSection {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.actionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.actionCard {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.actionCard:hover {
+  border-color: var(--nature-primary);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.2);
+}
+
+@media (max-width: 768px) {
+  .statsGrid,
+  .actionGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboardContainer {
+    padding-top: 60px;
+  }
+}
+

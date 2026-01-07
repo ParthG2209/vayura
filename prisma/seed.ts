@@ -1,0 +1,138 @@
+import { PrismaClient } from '../src/generated/prisma';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  console.log('🌱 Starting database seed...');
+
+  // Sample districts from different states of India
+  const districts = [
+    {
+      name: 'Bangalore Urban',
+      slug: 'bangalore-urban',
+      state: 'Karnataka',
+      population: 12765000,
+      latitude: 12.9716,
+      longitude: 77.5946,
+    },
+    {
+      name: 'Mumbai City',
+      slug: 'mumbai-city',
+      state: 'Maharashtra',
+      population: 12442373,
+      latitude: 19.076,
+      longitude: 72.8777,
+    },
+    {
+      name: 'Delhi',
+      slug: 'delhi',
+      state: 'Delhi',
+      population: 16787941,
+      latitude: 28.7041,
+      longitude: 77.1025,
+    },
+    {
+      name: 'Pune',
+      slug: 'pune',
+      state: 'Maharashtra',
+      population: 7427000,
+      latitude: 18.5204,
+      longitude: 73.8567,
+    },
+    {
+      name: 'Hyderabad',
+      slug: 'hyderabad',
+      state: 'Telangana',
+      population: 10456000,
+      latitude: 17.385,
+      longitude: 78.4867,
+    },
+    {
+      name: 'Chennai',
+      slug: 'chennai',
+      state: 'Tamil Nadu',
+      population: 10971000,
+      latitude: 13.0827,
+      longitude: 80.2707,
+    },
+    {
+      name: 'Kolkata',
+      slug: 'kolkata',
+      state: 'West Bengal',
+      population: 14850000,
+      latitude: 22.5726,
+      longitude: 88.3639,
+    },
+    {
+      name: 'Jaipur',
+      slug: 'jaipur',
+      state: 'Rajasthan',
+      population: 3073350,
+      latitude: 26.9124,
+      longitude: 75.7873,
+    },
+    {
+      name: 'Lucknow',
+      slug: 'lucknow',
+      state: 'Uttar Pradesh',
+      population: 2817105,
+      latitude: 26.8467,
+      longitude: 80.9462,
+    },
+    {
+      name: 'Ahmedabad',
+      slug: 'ahmedabad',
+      state: 'Gujarat',
+      population: 8450000,
+      latitude: 23.0225,
+      longitude: 72.5714,
+    },
+  ];
+
+  // Create districts
+  for (const districtData of districts) {
+    const district = await prisma.district.upsert({
+      where: { slug: districtData.slug },
+      update: {},
+      create: districtData,
+    });
+
+    console.log(`✓ Created district: ${district.name}`);
+
+    // Create sample environmental data for each district
+    await prisma.environmentalData.create({
+      data: {
+        districtId: district.id,
+        aqi: Math.floor(Math.random() * 200) + 50, // Random AQI between 50-250
+        pm25: Math.random() * 100 + 20, // Random PM2.5
+        soilQuality: Math.random() * 40 + 40, // Random soil quality 40-80
+        disasterFrequency: Math.random() * 10, // Random disaster frequency
+        dataSource: 'seed_data',
+      },
+    });
+
+    // Create initial leaderboard entry
+    await prisma.leaderboardEntry.create({
+      data: {
+        districtId: district.id,
+        totalTreesPlanted: 0,
+        totalTreesDonated: 0,
+        totalTrees: 0,
+        oxygenOffset: 0,
+      },
+    });
+
+    console.log(`  ✓ Added environmental data and leaderboard entry`);
+  }
+
+  console.log('\n🌳 Seed completed successfully!');
+}
+
+main()
+  .catch((e) => {
+    console.error('❌ Error during seeding:', e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

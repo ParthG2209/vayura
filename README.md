@@ -1,0 +1,263 @@
+# Vayura
+
+**District-Level Oxygen Intelligence for a Greener India**
+
+Vayura is an open-source web application that estimates district-level oxygen demand across India and converts it into actionable tree-plantation and donation workflows. Built with transparency, scientific accuracy, and community contribution at its core.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-16.1+-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://www.python.org/)
+
+## Features
+
+- **All Indian Districts**: Comprehensive coverage of every district across India
+- **District-Level Analysis**: Search any Indian district to see detailed environmental metrics
+- **Oxygen Calculation**: Transparent scientific formulas estimate oxygen demand vs. supply
+- **Tree Requirements**: Clear calculation of trees needed to offset oxygen deficit
+- **Environmental Health Card**: AQI, soil quality, disaster frequency, population data
+- **AI-Powered Data Fetching**: Uses Gemini AI to intelligently aggregate data from multiple government sources
+- **Tree Contribution System**: Upload tree plantation photos analyzed by AI for environmental impact
+- **NGO Integration**: Donate trees through verified NGOs (Tree-Nation)
+- **State Leaderboard**: Rankings by oxygen self-sufficiency across Indian states
+- **User Contributions**: Track your personal environmental impact
+- **Transparent Methodology**: All formulas and assumptions clearly explained
+
+## Tech Stack
+
+### Frontend
+- **Next.js 16+** (App Router)
+- **React 19** with TypeScript
+- **Tailwind CSS** for styling
+- **Recharts** for data visualization
+
+### Backend
+- **Node.js** (Next.js API Routes)
+- **Python FastAPI** microservice for oxygen calculations (optional)
+- **Firebase Firestore** for database
+- **Firebase Authentication** for user management
+- **Firebase Storage** for image uploads
+- **Google Gemini AI** for intelligent data aggregation
+
+## Prerequisites
+
+- Node.js 18+ and npm
+- Python 3.11+ (optional, for calculation microservice)
+- **Firebase Project**: For authentication, database, and storage
+- **Google Gemini API Key**: For intelligent data fetching
+
+## Quick Start
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/manasdutta04/vayura.git
+cd vayura
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Set Up Firebase
+
+1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
+2. Enable **Authentication** (Email/Password and Google providers)
+3. Create a **Firestore Database** (start in production mode)
+4. Create a **Cloud Storage** bucket
+5. Download service account key: Project Settings > Service Accounts > Generate New Private Key
+6. Save the JSON file as `firebase-service-account.json` in the project root
+
+### 4. Set Up Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```bash
+# Firebase Configuration
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+
+# Firebase Admin SDK (Server-side)
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_CLIENT_EMAIL=your_service_account_email
+FIREBASE_PRIVATE_KEY=your_private_key
+
+# Google Gemini API
+GEMINI_API_KEY=your_gemini_api_key
+
+# OpenWeatherMap (Optional, for AQI fallback)
+OPENWEATHERMAP_API_KEY=your_openweathermap_key
+
+# Base URL
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+```
+
+### 5. Set Up Firestore
+
+1. Deploy Firestore indexes:
+   - Copy the index URL from `firestore.indexes.json` errors
+   - Or deploy via Firebase Console
+
+2. Deploy Firestore security rules:
+   - Copy rules from `firestore.rules` to Firebase Console > Firestore > Rules
+
+3. Seed initial data:
+```bash
+npx tsx scripts/seed-districts.ts
+npx tsx scripts/seed-forest-cover-data.ts
+```
+
+### 6. Start Development Server
+
+```bash
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to see the application.
+
+## Oxygen Calculation Methodology
+
+Vayura uses a transparent, scientifically-based formula:
+
+### 1. Base Human O₂ Demand
+```
+Population × 550 L/day × 365 days → kg/year
+```
+
+### 2. Penalty Factors
+- **AQI Factor** (1.0 - 1.75×): Higher pollution increases respiratory demand
+- **Soil Degradation** (1.0 - 1.6×): Poor soil = less natural O₂ sources
+- **Disaster Loss** (1.05 - 1.5×): Frequent disasters destroy vegetation
+
+### 3. Adjusted Demand
+```
+Base Demand × AQI Factor × Soil Factor × Disaster Factor
+```
+
+### 4. Tree O₂ Supply
+- Base: 110 kg/year per mature tree
+- Adjusted by soil quality (healthier soil = healthier trees)
+- Lifespan calculation: 50 years average × 110 kg/year
+
+### 5. Trees Required
+```
+Oxygen Deficit ÷ Adjusted Tree Supply
+```
+
+**All assumptions and data sources are displayed in the UI for full transparency.**
+
+## Data Sources
+
+Vayura uses a multi-tier data fetching approach:
+
+1. **Primary**: Google Gemini AI - Intelligently aggregates data from multiple government sources
+2. **Secondary**: OpenWeatherMap API - Real-time AQI data
+3. **Fallback**: Built-in government published data and statistical estimates
+
+See [DATA_SOURCES.md](./DATA_SOURCES.md) for complete data source documentation.
+
+## Project Structure
+
+```
+vayura/
+├── src/
+│   ├── app/                    # Next.js pages and API routes
+│   │   ├── api/               # Backend API endpoints
+│   │   │   ├── districts/     # District search and details
+│   │   │   ├── plant/         # Tree planting submission
+│   │   │   ├── contribution/  # User contributions
+│   │   │   └── leaderboard/   # State rankings
+│   │   ├── dashboard/         # Main dashboard
+│   │   ├── contribution/       # User contributions page
+│   │   ├── leaderboard/        # Leaderboard page
+│   │   └── plant/              # Plant a tree page
+│   ├── components/            # React components
+│   │   └── ui/                # Reusable UI components
+│   ├── lib/                   # Utility functions and shared code
+│   │   ├── types/             # TypeScript type definitions
+│   │   ├── data-sources/      # Environmental data integrations
+│   │   ├── firebase.ts        # Firebase client config
+│   │   ├── firebase-admin.ts  # Firebase Admin SDK
+│   │   └── utils/             # Helper functions
+│   └── middleware.ts          # Next.js middleware
+├── scripts/                    # Database seeding scripts
+├── services/
+│   └── oxygen-calculator/      # Python FastAPI microservice (optional)
+├── public/                     # Static assets
+│   ├── logo.png               # Application logo
+│   └── favicon/               # Favicon files
+├── firestore.indexes.json     # Firestore index definitions
+├── firestore.rules            # Firestore security rules
+└── package.json
+```
+
+## Contributing
+
+We welcome contributions! This is an open-source project and your help makes it better.
+
+### How to Contribute
+
+1. **Fork the repository** on GitHub
+2. **Clone your fork** locally
+3. **Create a branch** for your feature (`git checkout -b feature/amazing-feature`)
+4. **Make your changes** following our coding standards
+5. **Test thoroughly** before committing
+6. **Commit** with clear messages (`git commit -m 'Add amazing feature'`)
+7. **Push** to your fork (`git push origin feature/amazing-feature`)
+8. **Open a Pull Request** on GitHub
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines.
+
+### Areas for Contribution
+
+- **Data Sources**: Add more government data integrations
+- **Features**: New functionality and improvements
+- **Documentation**: Improve docs and add examples
+- **Bug Fixes**: Report and fix issues
+- **UI/UX**: Design improvements and accessibility
+- **Testing**: Add tests and improve coverage
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+
+Copyright (c) 2026 Manas Dutta
+
+## Disclaimer
+
+**Important**: Vayura provides educational estimates based on available data and scientific models. The oxygen calculations and environmental metrics are:
+
+- **Not medical advice**: Do not use for health decisions
+- **Not policy guidance**: Consult experts for governance decisions
+- **Subject to data availability**: Accuracy depends on source data quality
+- **Estimates only**: Real-world conditions vary
+
+Always verify critical information with official sources and domain experts.
+
+## Acknowledgments
+
+- **WHO**: Human oxygen consumption standards
+- **USDA Forest Service**: Tree oxygen production research
+- **EPA**: Air Quality Index methodology
+- **Government of India**: Census, FSI, NDMA, CPCB data
+- **OpenWeatherMap**: Air quality data API
+- **Google Gemini**: AI-powered data aggregation
+- **The open-source community**: For inspiration and support
+
+## Contact & Support
+
+- **GitHub Repository**: [https://github.com/manasdutta04/vayura](https://github.com/manasdutta04/vayura)
+- **Issues**: [GitHub Issues](https://github.com/manasdutta04/vayura/issues)
+- **Contributions**: [See CONTRIBUTING.md](./CONTRIBUTING.md)
+
+---
+
+**Made with care for a greener India**
+
+*"Every tree counts. Every breath matters."*

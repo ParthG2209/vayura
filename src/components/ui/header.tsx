@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { AuthModal } from './auth-modal';
+import { Trophy } from 'lucide-react';
 
 export function Header() {
     const { user, loading, signOut } = useAuth();
@@ -52,6 +53,13 @@ export function Header() {
                                     className="text-sm text-gray-700 hover:text-gray-900 transition-colors font-medium"
                                 >
                                     Leaderboard
+                                </Link>
+                                <Link
+                                    href="/champions"
+                                    className="text-sm text-gray-700 hover:text-gray-900 transition-colors font-medium flex items-center gap-1"
+                                >
+                                    <Trophy className="w-4 h-4 text-amber-500" />
+                                    Champions
                                 </Link>
                                 <Link
                                     href="/calculator"
@@ -238,6 +246,15 @@ export function Header() {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                             </svg>
                                             <span>Leaderboard</span>
+                                        </Link>
+
+                                        <Link
+                                            href="/champions"
+                                            onClick={() => setShowMobileMenu(false)}
+                                            className="flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:bg-amber-50 hover:text-amber-700 rounded-lg transition-all duration-200 font-medium group"
+                                        >
+                                            <Trophy className="w-5 h-5 text-gray-400 group-hover:text-amber-600" />
+                                            <span>Champions</span>
                                         </Link>
                                     </>
                                 )}

@@ -4,7 +4,7 @@
  */
 
 // Achievement Badge Types
-export type BadgeType = 
+export type BadgeType =
     | 'GREEN_STARTER'      // 🌱 First verified contribution
     | 'OXYGEN_GUARDIAN'    // 🌳 Significant contribution milestone (10+ trees)
     | 'DISTRICT_CHAMPION'  // 🏆 Top contributor in a district
@@ -40,7 +40,7 @@ export const BADGE_DEFINITIONS: Record<BadgeType, BadgeDefinition> = {
         type: 'GREEN_STARTER',
         name: 'Green Starter',
         description: 'Made your first verified contribution',
-        icon: '🌱',
+        icon: 'Sprout',
         requirement: '1 verified tree',
         tier: 'bronze',
     },
@@ -48,7 +48,7 @@ export const BADGE_DEFINITIONS: Record<BadgeType, BadgeDefinition> = {
         type: 'OXYGEN_GUARDIAN',
         name: 'Oxygen Guardian',
         description: 'Significant environmental impact achieved',
-        icon: '🌳',
+        icon: 'TreeDeciduous',
         requirement: '10+ verified trees',
         tier: 'silver',
     },
@@ -56,7 +56,7 @@ export const BADGE_DEFINITIONS: Record<BadgeType, BadgeDefinition> = {
         type: 'DISTRICT_CHAMPION',
         name: 'District Champion',
         description: 'Top contributor in your district',
-        icon: '🏆',
+        icon: 'Trophy',
         requirement: '#1 in district',
         tier: 'gold',
     },
@@ -64,7 +64,7 @@ export const BADGE_DEFINITIONS: Record<BadgeType, BadgeDefinition> = {
         type: 'STATE_CHAMPION',
         name: 'State Champion',
         description: 'Top contributor in your state',
-        icon: '⭐',
+        icon: 'Star',
         requirement: '#1 in state',
         tier: 'platinum',
     },
@@ -72,7 +72,7 @@ export const BADGE_DEFINITIONS: Record<BadgeType, BadgeDefinition> = {
         type: 'ECO_WARRIOR',
         name: 'Eco Warrior',
         description: 'Committed environmental warrior',
-        icon: '🛡️',
+        icon: 'Shield',
         requirement: '50+ verified trees',
         tier: 'gold',
     },
@@ -80,7 +80,7 @@ export const BADGE_DEFINITIONS: Record<BadgeType, BadgeDefinition> = {
         type: 'FOREST_LEGEND',
         name: 'Forest Legend',
         description: 'Legendary contribution to the planet',
-        icon: '👑',
+        icon: 'Crown',
         requirement: '100+ verified trees',
         tier: 'platinum',
     },
@@ -92,14 +92,14 @@ export interface ContributorProfile {
     userName: string;
     userEmail?: string;
     photoURL?: string;
-    
+
     // Contribution Stats
     totalTreesPlanted: number;
     totalTreesDonated: number;
     totalTrees: number;
     totalO2Impact: number;
     verifiedContributions: number;
-    
+
     // Rankings
     districtRank?: number;
     districtId?: string;
@@ -107,10 +107,10 @@ export interface ContributorProfile {
     stateRank?: number;
     state?: string;
     nationalRank?: number;
-    
+
     // Badges
     badges: Badge[];
-    
+
     // Timestamps
     firstContributionAt?: Date;
     lastContributionAt?: Date;

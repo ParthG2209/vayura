@@ -4,8 +4,8 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useRouter } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/ui/header';
 import { Footer } from '@/components/ui/footer';
 import { DistrictSearch } from '@/components/ui/district-search';

@@ -4,7 +4,7 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/ui/header';
 import { Footer } from '@/components/ui/footer';
 import { useAuth } from '@/lib/auth-context';

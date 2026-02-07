@@ -58,7 +58,7 @@ function HomeContent() {
     fetchStats();
   }, []);
 
-  const handleDistrictSelect = (district: any) => {
+  const handleDistrictSelect = (district: { slug: string }) => {
     router.push(`/district/${district.slug}`);
   };
 
@@ -179,7 +179,7 @@ function HomeContent() {
 
             {/* Search Component */}
             <div className="w-full max-w-xl mx-auto mb-12 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 relative z-20">
-               <DistrictSearch onDistrictSelect={handleDistrictSelect} />
+              <DistrictSearch onDistrictSelect={handleDistrictSelect} />
             </div>
 
             {/* CTA Buttons */}

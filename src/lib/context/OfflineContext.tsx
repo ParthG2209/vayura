@@ -103,23 +103,27 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
 
     // Initial load and periodic refresh
     useEffect(() => {
-        refreshCacheStats();
-
-        // Cleanup expired entries on mount
-        cleanupExpired();
+        // Defer state-updating async work outside the effect body to satisfy strict hooks linting.
+        const initialRefresh = setTimeout(() => {
+            void refreshCacheStats();
+            void cleanupExpired();
+        }, 0);
 
         // Refresh stats periodically (every 5 minutes)
-        const interval = setInterval(refreshCacheStats, 5 * 60 * 1000);
+        const interval = setInterval(() => {
+            void refreshCacheStats();
+        }, 5 * 60 * 1000);
 
-        return () => clearInterval(interval);
+        return () => {
+            clearTimeout(initialRefresh);
+            clearInterval(interval);
+        };
     }, [refreshCacheStats, cleanupExpired]);
 
-    // Update data source based on network status
-    useEffect(() => {
-        if (!networkStatus.isOnline && currentDataSource === 'network') {
-            setCurrentDataSource('cache');
-        }
-    }, [networkStatus.isOnline, currentDataSource]);
+    const effectiveDataSource: DataSource =
+        !networkStatus.isOnline && currentDataSource === 'network'
+            ? 'cache'
+            : currentDataSource;
 
     const value: OfflineContextValue = {
         isOnline: networkStatus.isOnline,
@@ -127,7 +131,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
         cacheAvailable,
         stats,
         cachedDistricts,
-        currentDataSource,
+        currentDataSource: effectiveDataSource,
         isLoading,
         refreshCacheStats,
         clearCache,

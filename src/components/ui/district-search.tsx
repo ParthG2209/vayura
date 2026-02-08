@@ -74,9 +74,10 @@ export function DistrictSearch({
           setResults(data);
           setShowDropdown(true);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (!isCancelled) {
-          setError(err.message || "Failed to search districts");
+          const error = err as Error;
+          setError(error.message || "Failed to search districts");
         }
       } finally {
         if (!isCancelled) setLoading(false);
@@ -218,7 +219,7 @@ export function DistrictSearch({
                   No districts found
                 </h3>
                 <p className="text-sm text-gray-500 mb-1">
-                  We couldn't find "{debouncedQuery}".
+                  We couldn&apos;t find &quot;{debouncedQuery}&quot;.
                 </p>
                 <p className="text-sm text-gray-400 mb-3">
                   Try adjusting your search or filters.

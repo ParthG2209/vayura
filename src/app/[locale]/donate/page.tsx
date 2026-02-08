@@ -75,7 +75,7 @@ export default function DonatePage() {
 
     const handleSubmitVerification = async (event: React.FormEvent) => {
         event.preventDefault();
-        
+
         if (!user) {
             toast.error(t('pleaseSignIn'));
             return;
@@ -141,8 +141,9 @@ export default function DonatePage() {
                 router.push('/contribution');
             }, 2000);
 
-        } catch (err: any) {
-            toast.error(err.message || 'Failed to submit verification', {
+        } catch (err: unknown) {
+            const error = err as Error;
+            toast.error(error.message || 'Failed to submit verification', {
                 id: toastId
             });
         } finally {
@@ -411,7 +412,7 @@ export default function DonatePage() {
     );
 }
 
-function TransparencyItem({ label, active, icon }: { label: string, active: boolean, icon: any }) {
+function TransparencyItem({ label, active, icon }: { label: string, active: boolean, icon: React.ReactNode }) {
     return (
         <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1.5 text-gray-600">

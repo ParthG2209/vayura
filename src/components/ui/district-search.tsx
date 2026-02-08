@@ -138,7 +138,8 @@ export function DistrictSearch({
         }
       } catch (err: any) {
         if (!isCancelled) {
-          setError(err.message || "Failed to search districts");
+          const error = err as Error;
+          setError(error.message || "Failed to search districts");
         }
       } finally {
         if (!isCancelled) setLoading(false);

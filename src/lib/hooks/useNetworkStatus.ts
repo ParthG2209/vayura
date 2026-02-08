@@ -10,43 +10,61 @@ export interface NetworkStatus {
     saveData?: boolean;
 }
 
+interface NetworkInformationLike extends EventTarget {
+    effectiveType?: 'slow-2g' | '2g' | '3g' | '4g';
+    downlink?: number;
+    rtt?: number;
+    saveData?: boolean;
+    addEventListener(type: 'change', listener: EventListenerOrEventListenerObject): void;
+    removeEventListener(type: 'change', listener: EventListenerOrEventListenerObject): void;
+}
+
+interface NavigatorWithConnection extends Navigator {
+    connection?: NetworkInformationLike;
+    mozConnection?: NetworkInformationLike;
+    webkitConnection?: NetworkInformationLike;
+}
+
+const getConnection = () => {
+    if (typeof navigator === 'undefined') {
+        return undefined;
+    }
+    const nav = navigator as NavigatorWithConnection;
+    return nav.connection ?? nav.mozConnection ?? nav.webkitConnection;
+};
+
+const getCurrentStatus = (): NetworkStatus => {
+    if (typeof window === 'undefined') {
+        return { isOnline: true };
+    }
+    const connection = getConnection();
+    return {
+        isOnline: navigator.onLine,
+        effectiveType: connection?.effectiveType,
+        downlink: connection?.downlink,
+        rtt: connection?.rtt,
+        saveData: connection?.saveData,
+    };
+};
+
 /**
  * Hook to monitor network connectivity status
  */
 export function useNetworkStatus(): NetworkStatus {
     const [status, setStatus] = useState<NetworkStatus>(() => {
-        // SSR-safe initial state
-        if (typeof window === 'undefined') {
-            return { isOnline: true };
-        }
-        return { isOnline: navigator.onLine };
+        return getCurrentStatus();
     });
 
     const updateNetworkInfo = useCallback(() => {
         if (typeof window === 'undefined') return;
-
-        const connection = (navigator as any).connection ||
-            (navigator as any).mozConnection ||
-            (navigator as any).webkitConnection;
-
-        setStatus({
-            isOnline: navigator.onLine,
-            effectiveType: connection?.effectiveType,
-            downlink: connection?.downlink,
-            rtt: connection?.rtt,
-            saveData: connection?.saveData,
-        });
+        setStatus(getCurrentStatus());
     }, []);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
-        // Initial update
-        updateNetworkInfo();
-
         // Event listeners
         const handleOnline = () => {
-            setStatus(prev => ({ ...prev, isOnline: true }));
             updateNetworkInfo();
         };
 
@@ -58,7 +76,7 @@ export function useNetworkStatus(): NetworkStatus {
         window.addEventListener('offline', handleOffline);
 
         // Listen to connection changes if available
-        const connection = (navigator as any).connection;
+        const connection = getConnection();
         if (connection) {
             connection.addEventListener('change', updateNetworkInfo);
         }
